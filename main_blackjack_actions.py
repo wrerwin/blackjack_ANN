@@ -9,9 +9,9 @@ def play_blackjack_round():
     '''this function plays a 1v1 round of blackjack and outputs
     the decisions, cards, and whether the round resulted in a win'''
     [player_hand,dealer_first_card,deck] = generate_initial_game_state(deck)
-    while not result:   # this is meant to be a while loop that keeps going until a decision is reached regarding a win or loss
-        [cards,decision,result,deck] = play_blackjack_hand(player_hand,dealer_card,deck)
-    return hands_played,decisions_made,dealer_first_card,result
+    while not win_loss_result:   # this is meant to be a while loop that keeps going until a decision is reached regarding a win or loss
+        [cards,decision,win_loss_result,deck] = play_blackjack_hand(player_hand,dealer_card,deck)
+    return hands_played,decisions_made,dealer_first_card,win_loss_result
 
 def generate_initial_game_state(previous_hand,deck)
     '''this function generates the first hand of play hand'''
@@ -34,7 +34,7 @@ def play_blackjack_hand(player_hand,dealer_card,deck):
         else:
             pass # this will end the function without passing win_loss_result, something something args and kwargs 
         
-    return cards,decision,result
+    return cards,decision,win_loss_result
 
 def generate_new_hand(previous_hand,deck):
     '''this function adds a card to blackjack hand'''
