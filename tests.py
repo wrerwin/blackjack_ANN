@@ -22,12 +22,12 @@ def test_is_busted_5():
 
 def test_Deck_draw_card_1():
     my_deck = blackjack_engine.Deck(1)
-    assert len(my_deck) == 52
+    assert len(my_deck.cards) == 52
     card = my_deck.draw_card()
     assert card in [*range(1,13)]  # card is a valid integer
-    assert len(my_deck) == 51  # 51 cards left after draw
+    assert len(my_deck.cards) == 51  # 51 cards left after draw
     assert my_deck.count(card) == 3 # only 3 of same card left in deck
     card2 = my_deck.draw_card()
     assert card2 in [*range(1,13)]  # card2 is a valid integer
-    assert len(my_deck) == 50  # 50 cards left after second draw
+    assert len(my_deck.cards) == 50  # 50 cards left after second draw
     assert my_deck.count(card2) < 4 # only 2 or 3 of card2 left in deck
