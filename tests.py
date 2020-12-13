@@ -50,3 +50,8 @@ def test_dealer_bot_hard_20():
     hand = blackjack_engine.Hand([1,2,12,7])
     assert blackjack_engine.dealer_bot(hand) == 'stay'
     
+def test_Hand_is_soft():
+    assert False
+
+def test_Hand_add_card():
+    assert False

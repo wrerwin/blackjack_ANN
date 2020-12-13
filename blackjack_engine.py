@@ -26,6 +26,11 @@ class Hand():
         else:
             self.cards=cards
 
+    def add_card():
+        """adds card to hand"""
+        # probably just use list append
+        pass
+
     def sum_cards(self):
         # need to account for aces
         pass 
@@ -70,9 +75,14 @@ def blackjack_round():
         return -1
     
     # loop through dealer preset decisions
-    ### delaer decision code or fucntion goes here
-    if dealer_hand.is_busted():
-        return 1
+    while True:
+        hit_or_stay = dealer_bot(dealer_hand)
+        if hit_or_stay == 'stay':
+            break
+        if hit_or_stay == 'hit':
+            dealer_hand.add_card(deck.draw_card())
+        if dealer_hand.is_busted():
+            return 1
     
     # if neither busted, determine winner by comparing final 
     # player hand and final dealer hand
