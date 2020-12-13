@@ -1,15 +1,18 @@
 import blackjack_engine
 
-def test_sum_cards():
-    # 22, no aces
+def test_sum_cards_22_no_aces():
     assert blackjack_engine.Hand([13,5,7]).sum_cards() == 22
-    # 19, no aces
+
+def test_sum_cards_19_no_aces():
     assert blackjack_engine.Hand([10,9]).sum_cards() == 19
-    # soft 17
+
+def test_sum_cards_soft_17():
     assert blackjack_engine.Hand([1,6]).sum_cards() == 17
-    # hard 17
+
+def test_sum_cards_hard_17():
     assert blackjack_engine.Hand([1,12,6]).sum_cards() == 17
-    # hard 22 (ace=1)
+
+def test_sum_cards_hard_22():
     assert blackjack_engine.Hand([1,12,6,5]).sum_cards() == 22
 
 def test_Deck_draw_card():
