@@ -34,6 +34,12 @@ class Hand():
         """kinda unnecessary but whatever"""
         return self.sum_cards() > 21
 
+    def is_soft(self):
+        """return True if hand has ace being counted as 11"""
+        # this is needed for dealer logic, which hits on soft 17 
+        # but stays on hard 17
+        pass
+
 def blackjack_round():
     """ 
     Results:
@@ -82,3 +88,23 @@ def generate_initial_game_state():
     player_hand = Hand(deck.draw_card(2))
     dealer_hand = Hand(deck.draw_card(2))
     return deck, player_hand, dealer_hand
+
+def dealer_bot(dealer_hand):
+    """
+    Make a preset decisions for dealer given current hand.
+    Currently stays on soft 17
+
+    returns "hit" or "stay" 
+    """
+    total = dealer_hand.sum_cards()        
+
+    # this  assumes 21 case is handled outside function and a 21 hand will
+    # never need to get passed in
+    assert total >= 4 and total < 21
+
+    if total == 17 and dealer_hand.is_soft() == True:
+        return "hit"
+    elif total >= 17:
+        return "stay"
+    else:
+        return "hit"

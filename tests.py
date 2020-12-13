@@ -29,3 +29,24 @@ def test_Deck_draw_card():
     assert my_deck.cards.count(cards2[0]) < 4 # less than 4 of same card left in deck
     assert my_deck.cards.count(cards2[1]) < 4 
     assert my_deck.cards.count(cards2[2]) < 4 
+
+def test_dealer_bot_16():
+    hand = blackjack_engine.Hand([11,6])
+    assert blackjack_engine.dealer_bot(hand) == 'hit'
+
+def test_dealer_bot_hard_17():
+    hand = blackjack_engine.Hand([11,6,1])
+    assert blackjack_engine.dealer_bot(hand) == 'stay'
+
+def test_dealer_bot_soft_17():
+    hand = blackjack_engine.Hand([1,6])
+    assert blackjack_engine.dealer_bot(hand) == 'hit'
+
+def test_dealer_bot_20():
+    hand = blackjack_engine.Hand([12,4,6])
+    assert blackjack_engine.dealer_bot(hand) == 'stay'
+
+def test_dealer_bot_hard_20():
+    hand = blackjack_engine.Hand([1,2,12,7])
+    assert blackjack_engine.dealer_bot(hand) == 'stay'
+    
