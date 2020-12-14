@@ -70,9 +70,14 @@ def blackjack_round():
         return -1
 
     # loop through player decisions until stay or bust
-    ### player decision code or function goes here
-    if player_hand.is_busted():
-        return -1
+    while True:
+        hit_or_stay == random.choice(['hit', 'stay'])
+        if hit_or_stay == 'stay':
+            break
+        if hit_or_stay == 'hit':
+            player_hand.add_card(deck.draw_card())
+        if player_hand.is_busted():
+            return -1
     
     # loop through dealer preset decisions
     while True:
@@ -118,3 +123,4 @@ def dealer_bot(dealer_hand):
         return "stay"
     else:
         return "hit"
+
