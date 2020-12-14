@@ -52,16 +52,15 @@ def test_dealer_bot_hard_20():
 
 def test_Hand_is_soft_no_aces():
     hand = blackjack_engine.Hand([11,6])
-    assert not hand.is_soft()
+    assert hand.is_soft() == False
     
 def test_Hand_is_soft_soft_17():
     hand = blackjack_engine.Hand([1,6])
-    assert hand.is_soft()
+    assert hand.is_soft() == True
 
 def test_Hand_is_soft_hard_17():
     hand = blackjack_engine.Hand([11,6,1])
-    assert not hand.is_soft() 
-
+    assert hand.is_soft() == False
 
 def test_Hand_add_card():
     assert False
