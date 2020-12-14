@@ -107,7 +107,7 @@ def generate_initial_game_state():
 def dealer_bot(dealer_hand):
     """
     Make a preset decisions for dealer given current hand.
-    Currently stays on soft 17
+    Currently hits on soft 17
 
     returns "hit" or "stay" 
     """
