@@ -24,12 +24,17 @@ class Hand():
         if cards == None:
             self.cards = []
         else:
+            # add validator for bad cards (e.g. card=15)?
             self.cards=cards
 
-    def add_card():
-        """adds card to hand"""
-        # probably just use list append
-        pass
+    def add_card(self, card):
+        """
+        adds card to hand
+        raises Exception if card not valid
+        """
+        if card not in [*range(1,14)]:
+            raise ValueError("Not a valid card")
+        self.cards.append(card)
 
     def sum_cards(self):
         # need to account for aces

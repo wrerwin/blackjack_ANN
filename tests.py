@@ -1,4 +1,5 @@
 import blackjack_engine
+import pytest
 
 def test_sum_cards_22_no_aces():
     assert blackjack_engine.Hand([13,5,7]).sum_cards() == 22
@@ -62,5 +63,20 @@ def test_Hand_is_soft_hard_17():
     hand = blackjack_engine.Hand([11,6,1])
     assert hand.is_soft() == False
 
-def test_Hand_add_card():
-    assert False
+def test_Hand_add_card_goodcard():
+    hand = blackjack_engine.Hand([1,2,12,7])
+    hand.add_card(1)
+    hand.add_card(11)
+    hand.add_card(13)
+    assert hand.cards == [1,2,12,7,1,11,13]
+
+def test_Hand_add_card_badcard():
+    hand = blackjack_engine.Hand([1,2,12,7])
+    with pytest.raises(ValueError):
+        hand.add_card(15)
+    with pytest.raises(ValueError):
+        hand.add_card(0)
+    with pytest.raises(ValueError):
+        hand.add_card(1.5)
+    with pytest.raises(ValueError):
+        hand.add_card('cat')
