@@ -40,7 +40,10 @@ class Hand():
         return self.sum_cards() > 21
 
     def is_soft(self):
-        """return True if hand has ace being counted as 11"""
+        """
+        return True if hand has ace being counted as 11
+        return False otherwise
+        """
         # this is needed for dealer logic, which hits on soft 17 
         # but stays on hard 17
         pass
