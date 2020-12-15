@@ -21,16 +21,17 @@ class Deck():
 
 class Hand():
     def __init__(self, cards=None):
-        if cards == None:
-            self.cards = []
-        else:
-            # add validator for bad cards (e.g. card=15)?
-            self.cards=cards
+        if len(cards) < 2:
+            raise ValueError("Initial hand must have at least two cards")
+        # do it this way so it uses validator in add_card
+        self.cards = []
+        for card in cards:
+            self.add_card(card) 
 
     def add_card(self, card):
         """
         adds card to hand
-        raises Exception if card not valid
+        raises ValueError if card not valid
         """
         if card not in [*range(1,14)]:
             raise ValueError("Not a valid card")
