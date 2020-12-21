@@ -75,13 +75,24 @@ class Hand():
         # but stays on hard 17
         card_values = {1:11, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7,
                        8:8, 9:9, 10:10, 11:10, 12:10, 13:10}
-        card_values_hard = card_values.copy()
-        card_values_hard[1] = 1
 
         is_soft = False
         total = sum([card_values[card] for card in self.cards])
-        # if self.total > 21 and 1 in self.cards:
-        #     total = sum([card_values_hard[card] for card in self.cards])
+
+        # deal with aces
+        n_aces = self.cards.count(1)
+        print("total: ", total)
+        print("num aces: ", n_aces)
+        n_ace_ones = 0 # number of aces counted as 1
+        for i in range(n_aces):
+            if total > 21:
+                n_ace_ones += 1 
+                print('total was greater than 21. subtracting 10.')
+                total -= 10
+                print('new_total: ', total)
+        if n_ace_ones < n_aces:  # if at least one ace is 11
+            is_soft = True  
+        
         return total, is_soft
 
 
@@ -189,13 +200,13 @@ def dealer_bot(dealer_hand):
 
     returns "hit" or "stay" 
     """
-    total = dealer_hand.sum_cards()        
+    total = dealer_hand.total
 
     # this  assumes 21 case is handled outside function and a 21 hand will
     # never need to get passed in
     assert total >= 4 and total < 21
 
-    if total == 17 and dealer_hand.is_soft() == True:
+    if total == 17 and dealer_hand.is_soft == True:
         return "hit"
     elif total >= 17:
         return "stay"

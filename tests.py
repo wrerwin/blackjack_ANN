@@ -12,26 +12,53 @@ def test_Hand_total_soft_17():
     assert blackjack_engine.Hand([1,6]).total == 17
 
 def test_Hand_total_hard_17():
-    assert blackjack_engine.Hand([1,12,6]).total == 17
+    assert blackjack_engine.Hand([1,9,7]).total == 17
 
 def test_Hand_total_hard_22():
-    assert blackjack_engine.Hand([1,12,6,5]).total == 22
+    assert blackjack_engine.Hand([1,9,6,6]).total == 22
 
 def test_Hand_total_two_aces():
     # one ace is hard and one is soft
-    assert False
+    assert blackjack_engine.Hand([1,2,1]).total == 14
 
-def test_Hand_is_soft_no_aces():
-    hand = blackjack_engine.Hand([11,6])
-    assert hand.is_soft() == False
-    
+def test_Hand_total_three_aces():
+    # two aces are hard and one is soft
+    assert blackjack_engine.Hand([1,1,1,3]).total == 16
+
+def test_Hand_total_three_aces_hard():
+    # three aces, all are hard
+    assert blackjack_engine.Hand([5,1,1,5,1]).total == 13
+
+def test_Hand_total_three_aces():
+    # two aces are hard and one is soft
+    assert blackjack_engine.Hand([1,1,1,3]).total == 16
+
+def test_Hand_is_soft_22_no_aces():
+    assert blackjack_engine.Hand([13,5,7]).is_soft == False
+
+def test_Hand_is_soft_19_no_aces():
+    assert blackjack_engine.Hand([10,9]).is_soft == False
+
 def test_Hand_is_soft_soft_17():
-    hand = blackjack_engine.Hand([1,6])
-    assert hand.is_soft() == True
+    assert blackjack_engine.Hand([1,6]).is_soft == True
 
 def test_Hand_is_soft_hard_17():
-    hand = blackjack_engine.Hand([11,6,1])
-    assert hand.is_soft() == False
+    assert blackjack_engine.Hand([1,9,7]).is_soft == False
+
+def test_Hand_is_soft_hard_22():
+    assert blackjack_engine.Hand([1,9,6,6]).is_soft == False
+
+def test_Hand_is_soft_two_aces():
+    # one ace is hard and one is soft
+    assert blackjack_engine.Hand([1,2,1]).is_soft == True
+
+def test_Hand_is_soft_three_aces():
+    # two aces are hard and one is soft
+    assert blackjack_engine.Hand([1,1,1,3]).is_soft == True
+
+def test_Hand_total_three_aces_hard():
+    # three aces, all are hard
+    assert blackjack_engine.Hand([5,1,1,5,1]).is_soft == False
 
 def test_Hand_add_card_goodcard():
     hand = blackjack_engine.Hand([1,2,12,7])
@@ -55,6 +82,10 @@ def test_Hand_add_card_busted():
     hand = blackjack_engine.Hand([1,2,12,13])
     with pytest.raises(BustedHand):
         hand.add_card(5)
+
+def test_Hand_init_busted():
+    # can't initialize a busted hand
+    assert False
 
 # Deck tests
 def test_Deck_draw_card():
