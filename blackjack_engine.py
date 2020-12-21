@@ -64,7 +64,6 @@ class Hand():
             raise BustedHand("Can't add a card to a busted hand")
 
         self.cards.append(card)
-        print(self.cards)
         if len(self.cards) > 1:
             self.total, self.is_soft = self._sum_cards()
             if self.total > 21:
@@ -81,15 +80,11 @@ class Hand():
 
         # deal with aces
         n_aces = self.cards.count(1)
-        print("total: ", total)
-        print("num aces: ", n_aces)
         n_ace_ones = 0 # number of aces counted as 1
         for i in range(n_aces):
             if total > 21:
                 n_ace_ones += 1 
-                print('total was greater than 21. subtracting 10.')
                 total -= 10
-                print('new_total: ', total)
         if n_ace_ones < n_aces:  # if at least one ace is 11
             is_soft = True  
         
@@ -108,7 +103,7 @@ class BlackjackGame():
     Attributes (read only):
         player_hand (Hand): current player hand
         dealer_hand (Hand): current dealer hand
-        dealer_upcard (int): dealer upcard, which is dealer_hand[0]
+        dealer_upcard (int): dealer upcard, which is dealer_hand.cards[0]
         is_finished (boolean): whether the game is finished
         result (int): result of the game is -1, 0, 1, or 1.5.
             Or None if game not finished.
@@ -119,12 +114,14 @@ class BlackjackGame():
     """
     def __init__(self):
         self.deck = Deck()
-        self.player_hand = Hand(deck.draw_card(2))
-        self.dealer_hand = Hand(deck.draw_card(2))
-        self.dealer_upcard = self.dealer_hand[0]
+        self.player_hand = Hand(self.deck.draw_card(2))
+        self.dealer_hand = Hand(self.deck.draw_card(2))
+        self.dealer_upcard = self.dealer_hand.cards[0]
         self.is_finished = False
         self.result = None
-        if cfb_result := self._check_for_blackjacks() is not None:
+
+        cfb_result = self._check_for_blackjacks()
+        if cfb_result is not None:
             self.is_finished = True
             self.result = cfb_result
     
@@ -133,9 +130,9 @@ class BlackjackGame():
         checks if player, dealer, or both have blackjack
         """
         player_blackjack = dealer_blackjack = False
-        if self.player_hand.sum_cards == 21:
+        if self.player_hand.total == 21:
             player_blackjack = True
-        if self.dealer_hand.sum_cards == 21:
+        if self.dealer_hand.total == 21:
             dealer_blackjack = True
         if player_blackjack and dealer_blackjack:
             return 0
@@ -156,35 +153,39 @@ class BlackjackGame():
         if hit_or_stay == 'stay':
             self._dealer_turn()
         elif hit_or_stay == 'hit':
-            player_hand.add_card(deck.draw_card())
+            self.player_hand.add_card(self.deck.draw_card())
             # check for game status changes after move
-            if player_hand.is_busted():
+            if self.player_hand.is_busted:
                 self._finish_game(-1)
-            elif player_hand.total == 21:
+            elif self.player_hand.total == 21:
                 # in this case, game isn't over but player is done
                 self._dealer_turn() # updates dealer hand
-            elif player_hand.total < 21:
+            elif self.player_hand.total < 21:
                 pass
         
     def _dealer_turn(self):
         # loop through dealer preset decisions
         # finishes game once dealer is done
         while True:
-            hit_or_stay = dealer_bot(dealer_hand)
+            hit_or_stay = dealer_bot(self.dealer_hand)
             if hit_or_stay == 'stay':
                 break
             if hit_or_stay == 'hit':
-                dealer_hand.add_card(deck.draw_card())
-            if dealer_hand.is_busted() or dealer_hand.total == 21:
+                self.dealer_hand.add_card(self.deck.draw_card())
+            if self.dealer_hand.is_busted or self.dealer_hand.total == 21:
                 break
         
         # Assuming dealer didn't bust, determine winner by comparing final 
         # player hand and final dealer hand
-        if player_total == dealer_total:
+        player_total = self.player_hand.total
+        dealer_total = self.dealer_hand.total
+        if self.dealer_hand.is_busted:
+            self._finish_game(1)
+        elif player_total == dealer_total:
             self._finish_game(0)
-        if player_total > dealer_total:
-            self.finish_game(1)
-        if player_total < dealer_total:
+        elif player_total > dealer_total:
+            self._finish_game(1)
+        elif player_total < dealer_total:
             self._finish_game(-1)
 
     def _finish_game(self, result):
