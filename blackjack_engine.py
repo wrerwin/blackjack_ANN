@@ -1,5 +1,9 @@
 import random
 
+CARDS = ['A', '2', '3', '4', '5','6', '7', '8', '9', '10', 'J', 'Q', 'K']
+CARD_VALUES = {'A':11, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7,
+               '8':8, '9':9, '10':10, 'J':10, 'Q':10, 'K':10}
+
 class GameOver(Exception):
     pass
 
@@ -22,7 +26,7 @@ class Deck():
 
     def _random_deck(self):
         # generate random deck of n*52 cards
-        deck = 4*[*range(1,14)]
+        deck = 4*CARDS
         random.shuffle(deck)
         return deck
 
@@ -40,7 +44,7 @@ class Hand():
     Don't try to remove cards. Instead, create a new Hand without the 
     card you want to remove.
     """
-    def __init__(self, cards=None):
+    def __init__(self, cards):
         if len(cards) < 2:
             raise ValueError("Initial hand must have at least two cards")
         self.cards = []
@@ -48,7 +52,7 @@ class Hand():
         self.is_soft = None
         self.is_busted = False
         # self.is_blackjack = False
-        # do it this way so it uses validator in add_card
+        # do it this way so it uses validators in add_card
         for card in cards:
             self.add_card(card) 
 
@@ -57,7 +61,7 @@ class Hand():
         adds card to hand
         raises ValueError if card not valid
         """
-        if card not in [*range(1,14)]:
+        if card not in CARDS:
             raise ValueError("Not a valid card")
 
         if self.is_busted == True:
@@ -72,14 +76,12 @@ class Hand():
     def _sum_cards(self):
         # is_soft is needed for dealer logic, which hits on soft 17 
         # but stays on hard 17
-        card_values = {1:11, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7,
-                       8:8, 9:9, 10:10, 11:10, 12:10, 13:10}
 
         is_soft = False
-        total = sum([card_values[card] for card in self.cards])
+        total = sum([CARD_VALUES[card] for card in self.cards])
 
         # deal with aces
-        n_aces = self.cards.count(1)
+        n_aces = self.cards.count('A')
         n_ace_ones = 0 # number of aces counted as 1
         for i in range(n_aces):
             if total > 21:
