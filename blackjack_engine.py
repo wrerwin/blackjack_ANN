@@ -38,6 +38,7 @@ class Hand():
         is_soft: True if hand has an ace counted as 11, False otherwise
         is_busted: True if total > 21
         is_blackjack: true if only two cards and they are ace + face card
+        is_pair: True if a two card hand where both cards have same VALUE
     methods:
         add_cards: add single card to hand and updates attributes
 
@@ -51,6 +52,7 @@ class Hand():
         self.total = None
         self.is_soft = None
         self.is_busted = False
+        self.is_pair = False
         # self.is_blackjack = False
         # do it this way so it uses validators in add_card
         for card in cards:
@@ -68,6 +70,12 @@ class Hand():
             raise BustedHand("Can't add a card to a busted hand")
 
         self.cards.append(card)
+        # if exactly two cards, could be a pair
+        self.is_pair = False
+        if len(self.cards) == 2:
+            if CARD_VALUES[self.cards[0]] == CARD_VALUES[self.cards[1]]:
+                self.is_pair = True
+        # if at least two cards it's an actual hand that has a total
         if len(self.cards) > 1:
             self.total, self.is_soft = self._sum_cards()
             if self.total > 21:

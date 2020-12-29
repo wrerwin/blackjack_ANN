@@ -94,6 +94,30 @@ def test_Hand_init_busted():
     # can initialize a busted hand, but can't add any more cards.
     hand = blackjack_engine.Hand(['J','8','8']) 
 
+def test_Hand_is_pair_two_numbers():
+    hand = blackjack_engine.Hand(['3','3'])
+    assert hand.is_pair == True
+
+def test_Hand_is_pair_two_aces():
+    hand = blackjack_engine.Hand(['A','A'])
+    assert hand.is_pair == True
+
+def test_Hand_is_pair_two_same_faces():
+    hand = blackjack_engine.Hand(['Q','Q'])
+    assert hand.is_pair == True
+
+def test_Hand_is_pair_two_diff_faces():
+    hand = blackjack_engine.Hand(['Q','K'])
+    assert hand.is_pair == True
+
+def test_Hand_is_pair_face_and_10():
+    hand = blackjack_engine.Hand(['K','10'])
+    assert hand.is_pair == True
+
+def test_Hand_is_pair_not_pair():
+    hand = blackjack_engine.Hand(['A','8'])
+    assert hand.is_pair == False
+
 # Deck tests
 def test_Deck_draw_card():
     my_deck = blackjack_engine.Deck()
