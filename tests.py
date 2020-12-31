@@ -2,6 +2,7 @@ import blackjack_engine
 import pytest
 
 # Hand tests
+## Hand.total
 def test_Hand_total_22_no_aces():
     assert blackjack_engine.Hand(['K','5','7']).total == 22
 
@@ -33,6 +34,11 @@ def test_Hand_total_three_aces():
     # two aces are hard and one is soft
     assert blackjack_engine.Hand(['A','A','A','3']).total == 16
 
+def test_Hand_total_three_aces_hard():
+    # three aces, all are hard
+    assert blackjack_engine.Hand(['5','A','A','5','A']).is_soft == False
+
+## Hand.is_soft
 def test_Hand_is_soft_22_no_aces():
     assert blackjack_engine.Hand(['K','5','7']).is_soft == False
 
@@ -56,10 +62,7 @@ def test_Hand_is_soft_three_aces():
     # two aces are hard and one is soft
     assert blackjack_engine.Hand(['A','A','A','3']).is_soft == True
 
-def test_Hand_total_three_aces_hard():
-    # three aces, all are hard
-    assert blackjack_engine.Hand(['5','A','A','5','A']).is_soft == False
-
+## Hand.add_card
 def test_Hand_add_card_goodcard():
     hand = blackjack_engine.Hand(['A','2'])
     hand.add_card('A')
@@ -90,10 +93,15 @@ def test_Hand_add_card_busted():
     with pytest.raises(blackjack_engine.BustedHand):
         hand.add_card('5')
 
+## Hand initialized busted
 def test_Hand_init_busted():
-    # can initialize a busted hand, but can't add any more cards.
+    # can initialize a busted hand, but only if the last card
+    # was the one that busted it
     hand = blackjack_engine.Hand(['J','8','8']) 
+    with pytest.raises(blackjack_engine.BustedHand):
+        hand = blackjack_engine.Hand(['J','8','8','8']) 
 
+## Hand.is_pair
 def test_Hand_is_pair_two_numbers():
     hand = blackjack_engine.Hand(['3','3'])
     assert hand.is_pair == True
