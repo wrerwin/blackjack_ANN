@@ -63,6 +63,13 @@ def test_Hand_is_soft_three_aces():
     # two aces are hard and one is soft
     assert blackjack_engine.Hand(['A','A','A','3']).is_soft == True
 
+## Hand.is_blackjack
+def test_Hand_is_blackjack_True():
+    assert blackjack_engine.Hand(['A','Q']).is_blackjack == True
+
+def test_Hand_is_blackjack_True():
+    assert blackjack_engine.Hand(['A','9']).is_blackjack == False
+
 ## Hand.add_card
 def test_Hand_add_card_goodcard():
     hand = blackjack_engine.Hand(['A','2'])
@@ -90,17 +97,31 @@ def test_Hand_add_card_badcard():
         hand.add_card('cat')
 
 def test_Hand_add_card_busted():
+    # can't add card to a busted hand
     hand = blackjack_engine.Hand(['A','2','Q','K'])
-    with pytest.raises(blackjack_engine.BustedHand):
+    with pytest.raises(RuntimeError):
         hand.add_card('5')
 
-## Hand initialized busted
+def test_Hand_add_card_21():
+    # can't add a card to a 21 hand (non-blackjack)
+    hand = blackjack_engine.Hand(['10','2','9'])
+    with pytest.raises(RuntimeError):
+        hand.add_card('4')
+
+## Hand initialization
 def test_Hand_init_busted():
     # can initialize a busted hand, but only if the last card
     # was the one that busted it
     hand = blackjack_engine.Hand(['J','8','8']) 
-    with pytest.raises(blackjack_engine.BustedHand):
+    with pytest.raises(RuntimeError):
         hand = blackjack_engine.Hand(['J','8','8','8']) 
+
+def test_Hand_init_one_card():
+    # can't initialize a hand with one card since that's not
+    # a valid hand
+    with pytest.raises(ValueError):
+        hand = blackjack_engine.Hand(['J']) 
+        
 
 ## Hand.is_pair
 def test_Hand_is_pair_two_numbers():
@@ -134,19 +155,14 @@ def test_Hand_is_stayed_False():
     
 def test_Hand_is_stayed_True():
     hand = blackjack_engine.Hand(['A','8'])
-    hand.is_stayed = True
+    hand.stay()
     assert hand.is_stayed == True
-
-def test_Hand_is_stayed_ValueError():
-    hand = blackjack_engine.Hand(['A','8'])
-    with pytest.raises(ValueError):
-        hand.is_stayed = 'cat'
 
 def test_Hand_is_stayed_add_card():
     # can't add a card to a hand after stay
     hand = blackjack_engine.Hand(['A','8'])
-    hand.is_stayed = True
-    with pytest.raises(blackjack_engine.StayedHand):
+    hand.stay()
+    with pytest.raises(RuntimeError):
         hand.add_card('2')
     
 
@@ -165,6 +181,57 @@ def test_Deck_draw_card():
     assert my_deck.cards.count(cards2[0]) < 4 # less than 4 of same card left in deck
     assert my_deck.cards.count(cards2[1]) < 4 
     assert my_deck.cards.count(cards2[2]) < 4 
+
+# check_winner tests
+def test_Game_check_winner_player_blackjack():
+    player_hand = blackjack_engine.Hand(['A', '10'])
+    dealer_hand = blackjack_engine.Hand(['7', '10'])
+    assert blackjack_engine.check_winner(player_hand, dealer_hand) == 2
+
+def test_Game_check_winner_dealer_blackjack():
+    player_hand = blackjack_engine.Hand(['2', '10'])
+    dealer_hand = blackjack_engine.Hand(['J', 'A'])
+    assert blackjack_engine.check_winner(player_hand, dealer_hand) == -1
+
+def test_Game_check_winner_both_blackjack():
+    player_hand = blackjack_engine.Hand(['A', '10'])
+    dealer_hand = blackjack_engine.Hand(['J', 'A'])
+    assert blackjack_engine.check_winner(player_hand, dealer_hand) == 0
+
+def test_Game_check_winner_player_bust():
+    player_hand = blackjack_engine.Hand(['5', '10', '8'])
+    dealer_hand = blackjack_engine.Hand(['3', '2'])
+    assert blackjack_engine.check_winner(player_hand, dealer_hand) == -1
+
+def test_Game_check_winner_dealer_bust():
+    player_hand = blackjack_engine.Hand(['5', '10', '4'])
+    dealer_hand = blackjack_engine.Hand(['6', '8', '10'])
+    assert blackjack_engine.check_winner(player_hand, dealer_hand) == 1
+
+def test_Game_check_winner_both_bust():
+    player_hand = blackjack_engine.Hand(['5', '10', '10'])
+    dealer_hand = blackjack_engine.Hand(['6', '8', '10'])
+    assert blackjack_engine.check_winner(player_hand, dealer_hand) == -1
+
+def test_Game_check_winner_player_high():
+    player_hand = blackjack_engine.Hand(['5', '10', '5'])
+    dealer_hand = blackjack_engine.Hand(['6', '8', '5'])
+    assert blackjack_engine.check_winner(player_hand, dealer_hand) == 1
+
+def test_Game_check_winner_player_21():
+    player_hand = blackjack_engine.Hand(['5', 'K', '6'])
+    dealer_hand = blackjack_engine.Hand(['6', '8', '5'])
+    assert blackjack_engine.check_winner(player_hand, dealer_hand) == 1
+
+def test_Game_check_winner_dealer_high():
+    player_hand = blackjack_engine.Hand(['9', '8'])
+    dealer_hand = blackjack_engine.Hand(['5', 'K', '4'])
+    assert blackjack_engine.check_winner(player_hand, dealer_hand) == -1
+
+def test_Game_check_winner_dealer_21():
+    player_hand = blackjack_engine.Hand(['9', '10'])
+    dealer_hand = blackjack_engine.Hand(['4', 'J', '7'])
+    assert blackjack_engine.check_winner(player_hand, dealer_hand) == -1
 
 
 # Dealer bot tests
