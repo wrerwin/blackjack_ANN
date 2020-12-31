@@ -58,6 +58,10 @@ class Hand():
         for card in cards:
             self.add_card(card) 
 
+    def __repr__(self):
+        cards_string = '[' + ' '.join(self.cards) + ']'
+        return ', '.join([cards_string, "total: "+str(self.total)])
+
     def add_card(self, card):
         """
         adds card to hand
@@ -111,7 +115,7 @@ class BlackjackGame():
         blackjack: 1.5
 
     Attributes (read only):
-        player_hand (Hand): current player hand
+        player_hands (list of Hands): current player hand, multiple if split
         dealer_hand (Hand): current dealer hand
         dealer_upcard (int): dealer upcard, which is dealer_hand.cards[0]
         is_finished (boolean): whether the game is finished
@@ -124,7 +128,7 @@ class BlackjackGame():
     """
     def __init__(self):
         self.deck = Deck()
-        self.player_hand = Hand(self.deck.draw_card(2))
+        self.player_hands = [Hand(self.deck.draw_card(2))]
         self.dealer_hand = Hand(self.deck.draw_card(2))
         self.dealer_upcard = self.dealer_hand.cards[0]
         self.is_finished = False
@@ -140,7 +144,7 @@ class BlackjackGame():
         checks if player, dealer, or both have blackjack
         """
         player_blackjack = dealer_blackjack = False
-        if self.player_hand.total == 21:
+        if self.player_hands[0].total == 21:
             player_blackjack = True
         if self.dealer_hand.total == 21:
             dealer_blackjack = True
@@ -163,15 +167,23 @@ class BlackjackGame():
         if hit_or_stay == 'stay':
             self._dealer_turn()
         elif hit_or_stay == 'hit':
-            self.player_hand.add_card(self.deck.draw_card())
+            self.player_hands[0].add_card(self.deck.draw_card())
             # check for game status changes after move
-            if self.player_hand.is_busted:
+            if self.player_hands[0].is_busted:
                 self._finish_game(-1)
-            elif self.player_hand.total == 21:
+            elif self.player_hands[0].total == 21:
                 # in this case, game isn't over but player is done
                 self._dealer_turn() # updates dealer hand
-            elif self.player_hand.total < 21:
+            elif self.player_hands[0].total < 21:
                 pass
+        elif hit_or_stay == 'split':
+            if splittable == False:
+                raise CantSplit('Can\'t split this hand...') 
+            if splittable == True:
+                # split into two hands
+                hand_1 = Hand([self.player_hands[0].cards[0], self.Deck.draw_card()])
+                hand_2 = Hand([self.player_hands[0].cards[2], self.Deck.draw_card()])
+                # need code to play out both hands
         
     def _dealer_turn(self):
         # loop through dealer preset decisions
@@ -187,7 +199,7 @@ class BlackjackGame():
         
         # Assuming dealer didn't bust, determine winner by comparing final 
         # player hand and final dealer hand
-        player_total = self.player_hand.total
+        player_total = self.player_hands[0].total
         dealer_total = self.dealer_hand.total
         if self.dealer_hand.is_busted:
             self._finish_game(1)
