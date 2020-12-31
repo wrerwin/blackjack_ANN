@@ -10,6 +10,8 @@ class GameOver(Exception):
 class BustedHand(Exception):
     pass
 
+class StayedHand(Exception):
+    pass
 
 class Deck():
     """currently initializes as a random deck of 52 cards"""
@@ -53,6 +55,7 @@ class Hand():
         self.is_soft = None
         self.is_busted = False
         self.is_pair = False
+        self._is_stayed = False
         # self.is_blackjack = False
         # do it this way so it uses validators in add_card
         for card in cards:
@@ -72,6 +75,8 @@ class Hand():
 
         if self.is_busted == True:
             raise BustedHand("Can't add a card to a busted hand")
+        if self.is_stayed == True:
+            raise StayedHand("Can't add a card after staying on a hand")
 
         self.cards.append(card)
         # if exactly two cards, could be a pair
@@ -84,6 +89,17 @@ class Hand():
             self.total, self.is_soft = self._sum_cards()
             if self.total > 21:
                 self.is_busted = True
+                self.is_finished = True
+
+    @property
+    def is_stayed(self):
+        return self._is_stayed
+
+    @is_stayed.setter
+    def is_stayed(self, is_stayed_in):
+        if not isinstance(is_stayed_in, bool): 
+            raise ValueError("is_stayed must be a boolean")
+        self._is_stayed = True
  
     def _sum_cards(self):
         # is_soft is needed for dealer logic, which hits on soft 17 

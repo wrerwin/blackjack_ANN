@@ -1,6 +1,7 @@
 import blackjack_engine
 import pytest
 
+
 # Hand tests
 ## Hand.total
 def test_Hand_total_22_no_aces():
@@ -126,6 +127,29 @@ def test_Hand_is_pair_not_pair():
     hand = blackjack_engine.Hand(['A','8'])
     assert hand.is_pair == False
 
+## Hand.is_stayed
+def test_Hand_is_stayed_False():
+    hand = blackjack_engine.Hand(['A','8'])
+    assert hand.is_stayed == False
+    
+def test_Hand_is_stayed_True():
+    hand = blackjack_engine.Hand(['A','8'])
+    hand.is_stayed = True
+    assert hand.is_stayed == True
+
+def test_Hand_is_stayed_ValueError():
+    hand = blackjack_engine.Hand(['A','8'])
+    with pytest.raises(ValueError):
+        hand.is_stayed = 'cat'
+
+def test_Hand_is_stayed_add_card():
+    # can't add a card to a hand after stay
+    hand = blackjack_engine.Hand(['A','8'])
+    hand.is_stayed = True
+    with pytest.raises(blackjack_engine.StayedHand):
+        hand.add_card('2')
+    
+
 # Deck tests
 def test_Deck_draw_card():
     my_deck = blackjack_engine.Deck()
@@ -141,6 +165,7 @@ def test_Deck_draw_card():
     assert my_deck.cards.count(cards2[0]) < 4 # less than 4 of same card left in deck
     assert my_deck.cards.count(cards2[1]) < 4 
     assert my_deck.cards.count(cards2[2]) < 4 
+
 
 # Dealer bot tests
 # dealer bot tests will fail if Hand tests fail unfortunately
