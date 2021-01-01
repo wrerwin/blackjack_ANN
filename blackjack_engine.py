@@ -163,8 +163,8 @@ class BlackjackGame():
         lose: -1
         push: 0
         win: 1
-        blackjack: 1.5
-
+        blackjack: 2
+    
     Attributes (read only):
         player_hands (list of Hands): current player hand, multiple if split
         dealer_hand (Hand): current dealer hand
@@ -172,7 +172,7 @@ class BlackjackGame():
         is_finished (boolean): whether the game is finished
         result (int): result of the game is -1, 0, 1, or 1.5.
             Or None if game not finished.
-        deck (Deck): current deck
+        deck (Deck): current deck (default randomly shuffled deck)
 
     Methods:
         player_move (need better name?): update the game after player decision
@@ -180,6 +180,8 @@ class BlackjackGame():
     def __init__(self, deck=None):
         if deck == None:
             self.deck = Deck()
+        else:
+            self.deck = deck
         self.player_hands = [Hand(self.deck.draw_card(2))]
         self.dealer_hand = Hand(self.deck.draw_card(2))
         self.dealer_upcard = self.dealer_hand.cards[0]
