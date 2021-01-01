@@ -8,9 +8,11 @@ class GameOver(Exception):
     pass
 
 class Deck():
-    """currently initializes as a random deck of 52 cards"""
-    def __init__(self):
-        self.cards = self._random_deck()
+    """
+    currently initializes as a random deck of 52 cards
+    """
+    def __init__(self, seed=None):
+        self.cards = self._random_deck(seed)
 
     def draw_card(self, n=1):
         """return single card (int) or list of cards (list of ints)"""
@@ -20,10 +22,14 @@ class Deck():
         if n>1:
             return [self.draw_card() for x in range(n)] 
 
-    def _random_deck(self):
+    @staticmethod
+    def _random_deck(seed):
         # generate random deck of n*52 cards
         deck = 4*CARDS
-        random.shuffle(deck)
+        if seed == None:
+            random.shuffle(deck)
+        else:
+            random.Random(seed).shuffle(deck)
         return deck
 
 
@@ -171,12 +177,14 @@ class BlackjackGame():
     Methods:
         player_move (need better name?): update the game after player decision
     """
-    def __init__(self):
-        self.deck = Deck()
+    def __init__(self, deck=None):
+        if deck == None:
+            self.deck = Deck()
         self.player_hands = [Hand(self.deck.draw_card(2))]
         self.dealer_hand = Hand(self.deck.draw_card(2))
         self.dealer_upcard = self.dealer_hand.cards[0]
         self.is_finished = False
+        self._hand_number = None # which hand is currently being played
         self.result = None
 
         # replace this with a modified check_winner eventually
@@ -211,35 +219,22 @@ class BlackjackGame():
             raise GameOver("This game is over. Can't make a move.")
 
         for i,hand in enumerate(self.player_hands):
-            if hand.is_stayed == False and hand.total < 21:
-                if hit_or_stay == 'stay':
-                    self.player_hands[i].stay()
-                    # break
-                elif hit_or_stay == 'hit':
-                    self.player_hands[i].add_card(self.deck.draw_card())
-                # elif hit_or_stay == 'split':
-                #     if splittable == False:
-                #         raise CantSplit('Can\'t split this hand...') 
-                #     if splittable == True:
-                #         # split into two hands
-                #         hand_1 = Hand([self.player_hands[0].cards[0], self.Deck.draw_card()])
-                #         hand_2 = Hand([self.player_hands[0].cards[2], self.Deck.draw_card()])
-                #         # need code to play out both hands
-                break
+            if hit_or_stay == 'stay':
+                self.player_hands[i].stay()
+            elif hit_or_stay == 'hit':
+                self.player_hands[i].add_card(self.deck.draw_card())
+            elif hit_or_stay == 'split':
+                if is_pair == False:
+                    raise RuntimeError('Can\'t split this hand...') # move this to Hand???
+                if is_pair == True:
+                    # split into two hands
+                    hand_1 = Hand([self.player_hands[0].cards[0], self.Deck.draw_card()])
+                    hand_2 = Hand([self.player_hands[0].cards[2], self.Deck.draw_card()])
         if all(hand.is_finished for hand in self.player_hands):
             self.is_finished = True
             self._dealer_turn()
             for hand in self.player_hands:
                 self.result = check_winner(hand, self.dealer_hand)
-            # # check for game status changes after move
-            # if self.player_hands[i].is_busted:
-            #     self._finish_game(-1)
-            # elif self.player_hands[0].total == 21:
-            #     # in this case, game isn't over but player is done
-            #     self._dealer_turn() # updates dealer hand
-            # elif self.player_hands[0].total < 21:
-            #     pass
-            # self._finish_game(1)
     
     def _dealer_turn(self):
         # loop through dealer preset decisions
@@ -253,23 +248,6 @@ class BlackjackGame():
             if self.dealer_hand.is_busted or self.dealer_hand.total == 21:
                 break
         
-        # # Assuming dealer didn't bust, determine winner by comparing final 
-        # # player hand and final dealer hand
-        # player_total = self.player_hands[0].total
-        # dealer_total = self.dealer_hand.total
-        # if self.dealer_hand.is_busted:
-        #     self._finish_game(1)
-        # elif player_total == dealer_total:
-        #     self._finish_game(0)
-        # elif player_total > dealer_total:
-        #     self._finish_game(1)
-        # elif player_total < dealer_total:
-        #     self._finish_game(-1)
-
-#     def _finish_game(self, result):
-#         self.is_finished = True
-#         self.result = result
-
 def check_winner(player_hand, dealer_hand):
     """ returns number depending on outcome
     dealer wins: -1

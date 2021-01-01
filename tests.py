@@ -182,6 +182,15 @@ def test_Deck_draw_card():
     assert my_deck.cards.count(cards2[1]) < 4 
     assert my_deck.cards.count(cards2[2]) < 4 
 
+def test_Deck_seed():
+    # seeding deck gives same deck every time
+    # (not sure if this works cross-platform)
+    seeded_deck = blackjack_engine.Deck(seed=1)
+    assert seeded_deck.cards[:10] == ['J', '10', 'Q', '10', '3', 
+                                     'K', '7', 'Q', '10', '6']
+    assert seeded_deck.cards[-10:] == ['3', '5', '3', '6', '8', 
+                                      '4', '5', '10', 'J', '9']
+
 # check_winner tests
 def test_Game_check_winner_player_blackjack():
     player_hand = blackjack_engine.Hand(['A', '10'])
