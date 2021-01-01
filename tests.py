@@ -265,3 +265,136 @@ def test_dealer_bot_hard_20():
     hand = blackjack_engine.Hand(['A','2','Q','7'])
     assert blackjack_engine.dealer_bot(hand) == 'stay'
 
+# Game tests
+def test_Game_full_push_1():
+    # both dealt 20s, both stay, push
+    # player_hands: [[J 10], total: 20]
+    # dealer_hand: [Q 10], total: 20
+    seeded_deck = blackjack_engine.Deck(seed=1)
+    game = blackjack_engine.BlackjackGame(deck=seeded_deck)
+    assert game.is_finished == False
+    game.player_move('stay')
+    assert game.is_finished == True
+    assert game.player_hands[0].cards == ['J', '10']
+    assert game.dealer_hand.cards == ['Q', '10']
+    assert game.result == 0
+
+def test_Game_full_push_2():
+    # player hits to 19, dealer stays, push
+    # initial player hand: [3 4], total: 7
+    # initial dealer hand: [10 9], total: 19
+    seeded_deck = blackjack_engine.Deck(seed=2)
+    game = blackjack_engine.BlackjackGame(deck=seeded_deck)
+    game.player_move('hit')  # [[3 4 5], total: 12]
+    game.player_move('hit')  # [[3 4 5 7], total: 19]
+    assert game.is_finished == False
+    game.player_move('stay')
+    assert game.is_finished == True
+    assert game.player_hands[0].cards == ['3', '4', '5', '7']
+    assert game.dealer_hand.cards == ['10', '9']
+    assert game.result == 0
+
+def test_Game_full_loss_1():
+    # player hits to hard 19, dealer hits to 21, player loses
+    # initial player hand: [A 3], total: 14
+    # initial dealer hand: [4 7], total: 11
+    seeded_deck = blackjack_engine.Deck(seed=3)
+    game = blackjack_engine.BlackjackGame(deck=seeded_deck)
+    game.player_move('hit')  # [[A 3 4], total: 18]
+    game.player_move('hit')  # [[A 3 4 A], total: 19]
+    game.player_move('hit')  # [[A 3 4 A K], total: 19]
+    assert game.is_finished == False
+    game.player_move('stay')
+    assert game.is_finished == True
+    assert game.player_hands[0].cards == ['A', '3', '4', 'A', 'K']
+    assert game.dealer_hand.cards == ['4', '7', '10']
+    assert game.result == -1
+
+def test_Game_full_win_1():
+    # player hits on 16, wins with 21
+    # initial player hand [Q 6], total: 16
+    # initial dealer hand [10 K], total: 20
+    seeded_deck = blackjack_engine.Deck(seed=5)
+    game = blackjack_engine.BlackjackGame(deck=seeded_deck)
+    print('initial player hand', game.player_hands[0])
+    print('initial dealer hand', game.dealer_hand)
+    assert game.is_finished == False
+    game.player_move('hit')  
+    print('new player hand: ', game.player_hands)
+    assert game.is_finished == True
+    print('final dealer hand: ', game.dealer_hand)
+    assert game.player_hands[0].cards == ['Q', '6', '5']
+    assert game.dealer_hand.cards == ['10', 'K']
+    assert game.result == 1
+
+def test_Game_full_win_2():
+    # player hits to hard 18, dealer hits to hard 17, player wins
+    # initial player hand [Q 10], total: 20
+    # initial dealer hand [A 9], total: 20
+    seeded_deck = blackjack_engine.Deck(seed=7)
+    game = blackjack_engine.BlackjackGame(deck=seeded_deck)
+    print('initial player hand', game.player_hands[0])
+    print('initial dealer hand', game.dealer_hand)
+    assert game.is_finished == False
+    game.player_move('hit')  
+    print('player hand 2: ', game.player_hands)
+    game.player_move('hit')  
+    print('player hand 3: ', game.player_hands)
+    game.player_move('stay')  
+    assert game.is_finished == True
+    print('final dealer hand: ', game.dealer_hand)
+    assert game.player_hands[0].cards == ['5', 'A', '2', 'Q']
+    assert game.dealer_hand.cards == ['6', 'J', 'A']
+    assert game.result == 1
+
+def test_Game_full_win_3():
+    # player dealt blackjack, player wins
+    # initial player hand [10 A], total: 21
+    # initial dealer hand [J 6], total: 16
+    seeded_deck = blackjack_engine.Deck(seed=63)
+    game = blackjack_engine.BlackjackGame(deck=seeded_deck)
+    print('initial player hand', game.player_hands[0])
+    print('initial dealer hand', game.dealer_hand)
+    assert game.is_finished == True
+    print('final dealer hand: ', game.dealer_hand)
+    assert game.player_hands[0].cards == ['10', 'A']
+    # assert game.dealer_hand.cards == ['J', '6'] # behavior undefined?
+    assert game.result == 2
+                                                 
+# def test_Game_template():
+#     # player...
+#     # initial player hand: 
+#     # initial dealer hand: 
+#     seeded_deck = blackjack_engine.Deck(seed=4)
+#     game = blackjack_engine.BlackjackGame(deck=seeded_deck)
+#     print('initial player hand', game.player_hands[0])
+#     print('initial dealer hand', game.dealer_hand)
+#     assert game.is_finished == False
+#     game.player_move('hit')  
+#     print('player hand 2: ', game.player_hands)
+#     game.player_move('hit')  
+#     print(game.player_hands)
+#     print('player hand 3: ', game.player_hands)
+#     game.player_move('hit')  
+#     print('player hand 4: ', game.player_hands)
+#     game.player_move('hit')
+#     print('player hand 5: ', game.player_hands)
+#     game.player_move('hit')
+#     print('player hand 6: ', game.player_hands)
+#     game.player_move('hit')
+#     print('player hand 7: ', game.player_hands)
+#     game.player_move('hit')
+#     print('player hand 8: ', game.player_hands)
+#     game.player_move('hit')
+#     print('player hand 9: ', game.player_hands)
+#     game.player_move('hit')
+#     print('player hand 10: ', game.player_hands)
+#     game.player_move('hit')
+#     print('player hand 11: ', game.player_hands)
+#     game.player_move('hit')
+#     print('player hand 12: ', game.player_hands)
+#     print('final dealer hand: ', game.dealer_hand)
+#     assert game.player_hands[0].cards == ['A']
+#     assert game.dealer_hand.cards == ['4']
+#     assert game.result == -2
+                         
