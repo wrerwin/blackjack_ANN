@@ -189,29 +189,10 @@ class BlackjackGame():
         self._hand_number = None # which hand is currently being played
         self.result = None
 
-        # replace this with a modified check_winner eventually
-        cfb_result = self._check_for_blackjacks()
+        cfb_result = _check_for_blackjacks(self.player_hands[0], self.dealer_hand)
         if cfb_result is not None:
             self.is_finished = True
             self.result = cfb_result
-    
-    def _check_for_blackjacks(self):
-        """
-        checks if player, dealer, or both have blackjack
-        """
-        player_blackjack = dealer_blackjack = False
-        if self.player_hands[0].total == 21:
-            player_blackjack = True
-        if self.dealer_hand.total == 21:
-            dealer_blackjack = True
-        if player_blackjack and dealer_blackjack:
-            return 0
-        elif player_blackjack:
-            return 2
-        elif dealer_blackjack:
-            return -1
-        else:
-            return None
     
     def player_move(self, hit_or_stay):
         """ haven't implemented double or split 
@@ -257,12 +238,13 @@ def check_winner(player_hand, dealer_hand):
     player wins: 1
     player wins with blackjack: 2
     """
-    if player_hand.is_blackjack and dealer_hand.is_blackjack:
-        return 0
-    elif player_hand.is_blackjack:
-        return 2
-    elif dealer_hand.is_blackjack:
-        return -1
+    # check for blackjacks first
+    try:
+        cfb_result = _check_for_blackjacks(player_hand, dealer_hand)
+        if cfb_result is not None:
+            return cfb_result
+    except ValueError:
+        pass
 
     if player_hand.is_busted:
         return -1
@@ -275,6 +257,24 @@ def check_winner(player_hand, dealer_hand):
         return 1
     else:
         return -1
+
+def _check_for_blackjacks(player_hand, dealer_hand):
+    """ returns number depending on who has blackjacks
+    player and dealer blackjacks: 0
+    player blackjack only: 2
+    dealer blackjack only: -1
+    """
+    if len(player_hand.cards) != 2 or len(dealer_hand.cards) != 2:
+        raise ValueError("Can only compare between two hands of two cards each")
+
+    if player_hand.is_blackjack and dealer_hand.is_blackjack:
+        return 0
+    elif player_hand.is_blackjack:
+        return 2
+    elif dealer_hand.is_blackjack:
+        return -1
+    else:
+        return None
     
 def dealer_bot(dealer_hand):
     """

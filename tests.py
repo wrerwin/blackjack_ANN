@@ -122,7 +122,6 @@ def test_Hand_init_one_card():
     with pytest.raises(ValueError):
         hand = blackjack_engine.Hand(['J']) 
         
-
 ## Hand.is_pair
 def test_Hand_is_pair_two_numbers():
     hand = blackjack_engine.Hand(['3','3'])
@@ -190,6 +189,10 @@ def test_Deck_seed():
                                      'K', '7', 'Q', '10', '6']
     assert seeded_deck.cards[-10:] == ['3', '5', '3', '6', '8', 
                                       '4', '5', '10', 'J', '9']
+
+
+# _check_for_blackjack tests
+# not adding these since it's not meant to be a user facing function
 
 # check_winner tests
 def test_Game_check_winner_player_blackjack():
@@ -310,6 +313,19 @@ def test_Game_full_loss_1():
     assert game.dealer_hand.cards == ['4', '7', '10']
     assert game.result == -1
 
+def test_Game_full_loss_2():
+    # player...
+    # initial player hand [J 4], total: 14
+    # initial dealer hand [A K], total: 21
+    seeded_deck = blackjack_engine.Deck(seed=55832)
+    game = blackjack_engine.BlackjackGame(deck=seeded_deck)
+    print('initial player hand', game.player_hands[0])
+    print('initial dealer hand', game.dealer_hand)
+    assert game.is_finished == True
+    # assert game.player_hands[0].cards == [] # behavior undefined ?
+    assert game.dealer_hand.cards == ['A', 'K']
+    assert game.result == -1
+                         
 def test_Game_full_win_1():
     # player hits on 16, wins with 21
     # initial player hand [Q 6], total: 16
@@ -361,6 +377,7 @@ def test_Game_full_win_3():
     # assert game.dealer_hand.cards == ['J', '6'] # behavior undefined?
     assert game.result == 2
                                                  
+
 # def test_Game_template():
 #     # player...
 #     # initial player hand: 
